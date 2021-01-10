@@ -66,8 +66,10 @@ class Analyze(threading.Thread):
             try:
                 self.__sql.insert_data('TRANS', self.__trans)
                 self.__id += 1
+                print('OK')
             except:
                 pass
+            #time.sleep(random.random())
 
     def __amt_analysis(self, trans):
         amt = trans[4]
