@@ -1,0 +1,11 @@
+.DS_Store
+test_2.py
+test.py
+pip.rtf
+__pycache__/
+.vscode/
+data/Locale_all.txt
+py/__pycache__
+py/tempCodeRunnerFile.py
+py/.DS_Store
+data/.DS_Store
