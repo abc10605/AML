@@ -14,5 +14,5 @@ def main(sql):
 
 
 if __name__ == '__main__':
-    sql = SQL.SQL('db_test2')
+    sql = SQL.SQL('db_test')
     main(sql)
