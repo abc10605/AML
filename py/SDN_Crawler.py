@@ -3,7 +3,7 @@ import re
 import requests as rq
 from bs4 import BeautifulSoup as bs
 
-from . import Browser
+from Browser import Browser
 
 
 class SDN_Crawler():
@@ -26,7 +26,7 @@ class SDN_Crawler():
         self.__request(sql, self.__get_url())
 
     def __get_url(self):
-        browser = Browser.Browser()
+        browser = Browser()
         browser.open_browser()
         browser.search('https://www.mjib.gov.tw/mlpc')
         browser.find_partial_link_text('號決議制裁名單')
