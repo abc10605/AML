@@ -12,6 +12,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 class Browser():
     def __init__(self):
         if platform.system() == "Windows":
+            # AML/chromedriver
             self.__driver_path = f'{pathlib.Path(__file__).parent.parent}/chromedriver.exe'
         else:
             self.__driver_path = f'{pathlib.Path(__file__).parent.parent}/chromedriver'
