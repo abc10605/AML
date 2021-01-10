@@ -19,6 +19,7 @@ class Browser():
 
     def open_browser(self):
         chrome_options = Options()
+        # 無痕模式
         chrome_options.add_argument('--incognito')
         self.__browser = webdriver.Chrome(
             executable_path=self.__driver_path,
