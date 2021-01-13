@@ -1,22 +1,23 @@
 from py import SQL, Accounts, SDN_Crawler, Analyze
-import time
+
 
 def main(sql):
     if sql.query("SELECT * FROM SDN LIMIT 1") == []:
         SDN_Crawler.run(sql)
+    else:
+        print('SDN_list exists.')
     trans = Analyze.Analyze(sql)
-    acc = Accounts.Accounts(sql)
-    time.sleep(.1)
+    acc = Accounts.Accounts(sql, init_acc=None)
     trans.start()
     acc.start()
     while True:
         print(
-            f'\rGenerated Accounts: {acc.count}   Transactions: {trans.id}   SQL errors: {sql.errors}',
+            f'\rGenerated \033[1m\033[34mAccounts: {acc.count}   \033[33mTransactions: {trans.id}   \033[31mSQL errors: {sql.errors}\033[0m',
             end='',
             flush=True
         )
 
 
 if __name__ == '__main__':
-    sql = SQL.SQL('db_test')
+    sql = SQL.SQL('Final_db')
     main(sql)
