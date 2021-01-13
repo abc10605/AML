@@ -43,29 +43,29 @@ class Analyze(threading.Thread):
         self.__sql = sql
         self.__transaction = Transactions()
         # 抓交易檔數量（順序編號）
-        self.__id = self.__sql.query("SELECT COUNT(*) FROM TRANS")[0][0] + 1
+        self.id = self.__sql.query("SELECT COUNT(*) FROM TRANS")[0][0] + 1
         self.__from_acc = tuple([True] * 2 + [False] * 3)
 
     def run(self):
         while True:
             # 產生交易
             if random.choice(self.__from_acc):
-                self.__trans = self.__transaction.generate_transaction(
-                    self.__id,
+                trans = self.__transaction.generate_transaction(
+                    self.id,
                     self.__sql.query(
                         'SELECT acc FROM ACCOUNTS ORDER BY RANDOM() LIMIT 1')[0][0],
                     self.__sql.query(
                         'SELECT acc FROM ACCOUNTS ORDER BY RANDOM() LIMIT 1')[0][0]
                 )
             else:
-                self.__trans = self.__transaction.generate_transaction(
-                    self.__id)
+                trans = self.__transaction.generate_transaction(
+                    self.id)
 
             # 金額分析
-            self.__trans = self.__amt_analysis(self.__trans)
+            trans = self.__amt_analysis(trans)
             try:
-                self.__sql.insert_data('TRANS', self.__trans)
-                self.__id += 1
+                self.__sql.insert_data('TRANS', trans)
+                self.id += 1
             except:
                 pass
 

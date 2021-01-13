@@ -4,12 +4,12 @@ from sqlite3 import Error
 
 
 class SQL():
-    def __init__(self, file_name):  # Constructor -> 物件初始值
-        # 資料庫路徑
-        self.__db_file = f'{pathlib.Path(__file__).parent.parent}/data/'
-        pathlib.Path(self.__db_file).mkdir(
-            parents=True, exist_ok=True)  # 創建資料夾
-        self.__create_connection(f'{self.__db_file}/{file_name}.db')  # 連結資料庫
+    def __init__(self, file_name):                                                  # Constructor -> 物件初始值
+        db_file = f'{pathlib.Path(__file__).parent.parent}/data/'                   # 資料庫路徑
+        pathlib.Path(db_file).mkdir(
+            parents=True, exist_ok=True)                                            # 創建資料夾
+        self.__create_connection(f'{db_file}/{file_name}.db')                       # 連結資料庫
+        self.errors = 0
 
         # 創建資料表SQL指令
         create_table_sdn = """CREATE TABLE IF NOT EXISTS SDN (
@@ -52,29 +52,31 @@ class SQL():
         for i in create_table_accounts, create_table_trans, create_table_sdn:
             self.__create_table(i)
 
-    def __create_connection(self, db_file):  # 連結資料庫函式
+    def __create_connection(self, db_file):                                         # 連結資料庫函式
         try:
-            self.conn = sqlite3.connect(db_file, check_same_thread=False)
+            self.__conn = sqlite3.connect(db_file, check_same_thread=False)
         except Error as e:
             print(e)
 
-    def __create_table(self, script):  # 建立資料表函式
-        self.conn.cursor().execute(script)
+    def __create_table(self, script):                                               # 建立資料表函式
+        self.__conn.cursor().execute(script)
 
-    def insert_data(self, table, data):  # 插入資料函式
+    def insert_data(self, table, data):                                             # 插入資料函式
         try:
             # INSERT INTO TABLE VALUES (?, ?, ?, ?.......)
-            self.__script = f"INSERT INTO {table} VALUES ({('?,' * len(data))[:-1]})"
-            self.conn.cursor().execute(self.__script, data)
-            self.conn.commit()
-        except Error as e:
-            print(e)
+            script = f"INSERT INTO {table} VALUES ({('?,' * len(data))[:-1]})"
+            self.__conn.cursor().execute(script, data)
+            self.__conn.commit()
+        except Error:
+            #print(e)
+            #pass
+            self.errors += 1
 
-    def query(self, script):  # 查詢SQL
+    def query(self, script):                                                        # 查詢SQL
         try:
-            return self.conn.cursor().execute(script).fetchall()
+            return self.__conn.cursor().execute(script).fetchall()
         except:
             return None
 
-    def close(self):  # 關閉資料庫
-        self.conn.close()
+    def close(self):                                                                # 關閉資料庫
+        self.__conn.close()

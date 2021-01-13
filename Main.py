@@ -1,16 +1,20 @@
 from py import SQL, Accounts, SDN_Crawler, Analyze
-
+import time
 
 def main(sql):
     if sql.query("SELECT * FROM SDN LIMIT 1") == []:
-        SDN_Crawler.SDN_Crawler(sql)
+        SDN_Crawler.run(sql)
     trans = Analyze.Analyze(sql)
     acc = Accounts.Accounts(sql)
+    time.sleep(.1)
     trans.start()
     acc.start()
-    trans.join()
-    acc.join()
-    sql.close()
+    while True:
+        print(
+            f'\rGenerated Accounts: {acc.count}   Transactions: {trans.id}   SQL errors: {sql.errors}',
+            end='',
+            flush=True
+        )
 
 
 if __name__ == '__main__':

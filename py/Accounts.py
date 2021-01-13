@@ -4,32 +4,34 @@ import threading
 import time
 
 import faker
-import progressbar
 from faker_credit_score import CreditScore
 
 
 class Accounts(threading.Thread):
-    def __init__(self, sql):
+    def __init__(self, sql, init_acc=50):
         threading.Thread.__init__(self)
         self.__sql = sql
-        self.__locale = []
-        for i in open(f'{pathlib.Path(__file__).parent.parent}/data/locale.txt', 'r').readlines():
-            if i == '\n':
-                pass
-            else:
-                self.__locale.append(i.replace('\n', ''))
-        self.__locale = tuple(self.__locale)
+        self.__locale = tuple(
+            map(
+                lambda x: x.replace('\n', ''),
+                open(
+                    f'{pathlib.Path(__file__).parent.parent}/data/locale.txt',
+                    'r'
+                    ).readlines()
+                )
+            )
         self.__sdn_bool = tuple([True] + [False] * 499)
-        init_acc = 50
-        print('\nGenerating initial accounts')
-        for i in progressbar.progressbar(range(init_acc)):
+        self.count = sql.query('SELECT count(*) FROM ACCOUNTS')[0][0]
+        print('\n')
+        for i in range(init_acc):
             self.__generate_account(random.choice(self.__locale))
+            print(f'\rGenerating initial accounts.....{i}/50', end='', flush=True)
+        print(f'\rGenerating initial accounts.....Finished', end='\n', flush=True)
 
     def run(self):
         while True:
             self.__generate_account(random.choice(self.__locale))
-            #print('accounts generated')
-            time.sleep(random.random() * 3)
+            time.sleep(random.random())
 
     def __generate_account(self, locale):
         fk = faker.Faker(locale)
@@ -55,9 +57,8 @@ class Accounts(threading.Thread):
             profile['mail'],
             fk.company(),
             fk.job(),
-            faker.Faker().country(),
+            fk.country(),
             fk.credit_score()
         )
-        # if sdn:
-        #    print(f'sdn: {self.__account}')
         self.__sql.insert_data('ACCOUNTS', self.__account)
+        self.count += 1
