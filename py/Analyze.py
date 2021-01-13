@@ -135,7 +135,7 @@ def same_address(sql):
         ''')
     if addr != []:
         for i in addr:
-            print(i, '\n')
+            print(i)
     else:
         print('\nNo same address found\n')
 
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     from Browser import Browser
     from SQL import SQL
 
-    sql = SQL('db_test')
+    sql = SQL('Final_db')
     proc = eval(input(
         "\nWhich process do you want to run?\n1) SDN_ACC\n2) KYC\n3) SAME_ADDRESS\nEnter: "))
     if proc == 1:

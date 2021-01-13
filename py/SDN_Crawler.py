@@ -33,41 +33,46 @@ def request(sql, url):
                 'Address:',
                 'Listed on:'
             ])
-    print('\nCrawling newest SDN_list')
+    print('\nCrawling newest SDN_list...', end='')
     soup = bs(rq.get(url).text, 'html.parser')
     for i in soup.select('td'):
         title = []
         df = []
-        for k in i.select('strong'):
-            if k.text[2] != ')':
-                title.append(k.text.replace(u'\xa0', '').strip())
-        try:
-            for j in title[:-1]:
-                if j in title_list:
-                    df.append(
-                        i.text[
-                            i.text.find(j)+len(j):
-                                i.text.find(
-                                    title[title.index(j)+1])
-                        ].replace('\n', '').replace('\t', '').strip()
-                    )
-                else:
-                    if 'QDi' in j:
-                        df.append(j)
+        for j in i.select('strong'):
+            if j.text[2] != ')':
+                title.append(j.text.replace(u'\xa0', '').strip())
+        if title != []:
+            df.append(title[0])
+            for t in range(len(title_list)):
+                try:
+                    if title[t+1] in title_list:
+                        SDN_title = title[t+1]
+                        df.append(
+                            i.text[
+                                i.text.find(SDN_title)+len(SDN_title):
+                                    i.text.find(
+                                        title[title.index(SDN_title)+1])
+                            ].replace('\n', '').replace('\t', '').strip()
+                        )
                     else:
-                        df.append('')
+                        df.append(None)
+                except:
+                    df.append(None)
             name_list = []
             for j in df[1].split(':'):
                 name = ''.join(re.findall(r"\D", j)).strip()
-                name = (name if name != 'na' else '')
+                name = (name if name != 'na' else None)
                 if name != '' or name is not None or name != '\n':
                     name_list.append(name)
-            df[1] = '\n'.join(name_list[1:])
-            if df != [] or df[0] != '':
-                sql.insert_data('SDN', df)
-        except:
-            pass
+            try:
+                if name_list[0] == '' or name_list[0] == '\n':
+                    df[1] = '\n'.join(name_list[1:])
+                else:
+                    df[1] = '\n'.join(name_list)
+            except:
+                df[1] = None
+            sql.insert_data('SDN', df)
 
 def run(sql):
     request(sql, get_url())
-
+    print('\rCrawling newest SDN_list...\033[33mFinished!\033[0m', flush=True)
