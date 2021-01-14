@@ -19,5 +19,6 @@ def main(sql):
 
 
 if __name__ == '__main__':
+    # 資料庫名稱
     sql = SQL.SQL('Final_db')
     main(sql)

@@ -42,8 +42,11 @@ class Analyze(threading.Thread):
         threading.Thread.__init__(self)
         self.__sql = sql
         self.__transaction = Transactions()
-        # 抓交易檔數量（順序編號）
-        self.id = self.__sql.query("SELECT COUNT(*) FROM TRANS")[0][0] + 1
+        # 抓交易檔ID（順序編號）
+        try:
+            self.id = int(self.__sql.query("SELECT TransID FROM TRANS ORDER BY CAST(TransID as INT) DESC LIMIT 1")[0][0]) + 1
+        except:
+            self.id = 1
         self.__from_acc = tuple([True] * 2 + [False] * 3)
 
     def run(self):
@@ -80,6 +83,7 @@ class Analyze(threading.Thread):
             avg_amt = 1000000000000000
         if amt >= 10000000:
             trans[-1] = 2
+        # 若此次交易金額大於100萬，或是在平均交易金額的五倍以上，就標記2
         elif amt >= 1000000 and amt >= avg_amt * 5:
             trans[-1] = 2
         elif amt >= 100000 and amt >= avg_amt * 10:
@@ -103,17 +107,16 @@ class Analyze(threading.Thread):
 
 
 def sdn_acc(sql):
-    # 先抓所有帳戶
     acc = sql.query('select * from ACCOUNTS')
     print("\nBelow are the accounts having the same name as the SDN list\n")
     time.sleep(2)
     for i in acc:
-        if sql.query(f"select * from SDN where Name like '%{i[1]}%'") != []:
+        if sql.query(f"select * from SDN where Name like '%{i[1]}%'") != []:    # 查找帳戶中是否有名字與黑名單相似
             print(i)
 
 
 def kyc(sql):
-    acc = sql.query('select * from ACCOUNTS ORDER BY RANDOM() LIMIT 10')
+    acc = sql.query('select * from ACCOUNTS ORDER BY RANDOM() LIMIT 10')        # 利用google搜尋客戶名字
     browser = Browser()
     browser.open_browser()
     for i in acc:
@@ -122,7 +125,7 @@ def kyc(sql):
     browser.close_browser()
 
 
-def same_address(sql):
+def same_address(sql):                                                          # 查核是否有客戶住在相同地址
     print('\nChecking for same address\n')
     addr = sql.query(
         '''

@@ -38,12 +38,16 @@ def request(sql, url):
     for i in soup.select('td'):
         title = []
         df = []
+        # 先抓內容的標題
         for j in i.select('strong'):
             if j.text[2] != ')':
                 title.append(j.text.replace(u'\xa0', '').strip())
         if title != []:
+            # 先append編號(ex. Qdi.XXX)
             df.append(title[0])
+            # 迴圈13次
             for t in range(len(title_list)):
+                # 無論內容如何，至少都會append None，確保欄位數量都是13
                 try:
                     if title[t+1] in title_list:
                         SDN_title = title[t+1]
@@ -58,6 +62,7 @@ def request(sql, url):
                         df.append(None)
                 except:
                     df.append(None)
+            # 處理人名
             name_list = []
             for j in df[1].split(':'):
                 name = ''.join(re.findall(r"\D", j)).strip()
