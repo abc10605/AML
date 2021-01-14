@@ -8,4 +8,3 @@
 * pip install Faker
 * pip install faker-credit-score
 * pip install pathlib
-* pip install progressbar2
